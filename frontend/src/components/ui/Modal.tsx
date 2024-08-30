@@ -30,7 +30,7 @@ const ModalWindow = ({
               <div className="bg-white w-[90%] flex flex-col gap-[10px] p-[20px] items-center justify-center rounded-lg lg:w-[30%] left-[4%] lg:left-[35%] absolute z-10 mx-auto top-[30%]">
                 <Image src={"/icons/octagon-check.svg"} width={60} height={60} alt="attention" />
                 <h2 className="font-bold text-green-700">Success!</h2>
-                <p className="text-center py-[10px]">
+                <p className="text-center !text-black py-[10px]">
                   Successfully exchanged <b>{currentVal}</b> units of{" "}
                   <b>{currencyData[currentCurrencyIndex!].currency}</b> to <b>{targetAmount.toFixed(2)}</b> units of{" "}
                   <b>{currencyData[targetCurrencyIndex!].currency}</b>
@@ -49,7 +49,7 @@ const ModalWindow = ({
               <div className="bg-white w-[90%] flex flex-col gap-[10px] p-[20px] items-center justify-center rounded-lg lg:w-[30%] left-[4%] lg:left-[35%] absolute z-10 mx-auto top-[30%]">
                 <Image src={"/icons/exclamation.svg"} width={60} height={60} alt="attention" />
                 <h2 className="font-bold text-red-700">Attention!</h2>
-                <p className="text-center py-[10px]">
+                <p className="text-center !text-black  py-[10px]">
                   <b>Currency</b> and <b>Target Currency</b> <br /> fields is required
                 </p>
                 <button

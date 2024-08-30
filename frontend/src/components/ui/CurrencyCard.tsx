@@ -1,7 +1,9 @@
 import Image from "next/image";
+
 import React, { useState, useEffect, useRef } from "react";
 import * as yup from "yup";
-import ModalWindow from "./Modal";
+
+import ModalWindow from "@/components/ui/Modal";
 
 interface CurrencyData {
   currency: string;
@@ -18,14 +20,23 @@ const CurrencyCard: React.FC<ICurrencyCard> = ({ currencyData, availableNumOfCoi
   const validationSchema = yup.object().shape({
     currentCurrencyIndex: yup.number().nullable().required("Please select a source currency"),
     targetCurrencyIndex: yup.number().nullable().required("Please select a target currency"),
+    range: yup
+      .number()
+      .required("This range is required")
+      .min(1, `Range must be at least 1`)
+      .max(availableNumOfCoins, `Range cannot exceed ${availableNumOfCoins}`),
   });
 
   const [openModalWindow, setOpenModalWindow] = useState<boolean>(false);
   const [currentCurrencyIndex, setCurrentCurrencyIndex] = useState<number | null>(null);
   const [targetCurrencyIndex, setTargetCurrencyIndex] = useState<number | null>(null);
+  const [range, setRange] = useState<number>(1);
   const [validationError, setValidationError] = useState<boolean>(false);
+  const [validationMessage, setValidationMessage] = useState<string>("");
 
-  const [currentVal, setCurrentVal] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const [currentVal, setCurrentVal] = useState<number>(1);
   const rangeInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleSelectChange = (
@@ -36,11 +47,25 @@ const CurrencyCard: React.FC<ICurrencyCard> = ({ currencyData, availableNumOfCoi
     setIndex(selectedIndex >= 0 ? selectedIndex : null);
   };
 
+  setTimeout(() => {
+    if (isLoading) {
+      setOpenModalWindow(true);
+    }
+  }, 1000);
+
+  setTimeout(() => {
+    if (openModalWindow) {
+      setIsLoading(false);
+    }
+  }, 0);
+
   useEffect(() => {
     const rangeInput = rangeInputRef.current;
     if (rangeInput) {
       rangeInput.addEventListener("input", (event: any) => {
-        setCurrentVal(Number(event.target.value));
+        const value = Number(event.target.value);
+        setCurrentVal(value);
+        setRange(value);
       });
     }
     return () => {
@@ -52,14 +77,16 @@ const CurrencyCard: React.FC<ICurrencyCard> = ({ currencyData, availableNumOfCoi
 
   useEffect(() => {
     validationSchema
-      .validate({ currentCurrencyIndex, targetCurrencyIndex })
+      .validate({ currentCurrencyIndex, targetCurrencyIndex, range })
       .then(() => {
         setValidationError(false);
+        setValidationMessage("");
       })
       .catch((error) => {
         setValidationError(true);
+        setValidationMessage(error.message);
       });
-  }, [currentCurrencyIndex, targetCurrencyIndex]);
+  }, [currentCurrencyIndex, targetCurrencyIndex, range]);
 
   const calculatedPrice = currentCurrencyIndex !== null ? currencyData[currentCurrencyIndex].price * currentVal : 0;
   const targetAmount =
@@ -69,19 +96,15 @@ const CurrencyCard: React.FC<ICurrencyCard> = ({ currencyData, availableNumOfCoi
 
   const handleExchange = () => {
     if (validationError) {
-      alert(validationError);
+      setValidationError(true);
       return;
     } else {
-      alert(
-        `Successfully exchanged ${currentVal} units of ${
-          currencyData[currentCurrencyIndex!].currency
-        } to ${targetAmount.toFixed(2)} units of ${currencyData[targetCurrencyIndex!].currency}`
-      );
+      setValidationError(false);
     }
   };
 
   return (
-    <div className="flex flex-col bg-blue-500/5 border p-[10px] rounded-lg text-black gap-[10px]">
+    <div className="flex flex-col bg-blue-500/5 border p-[10px] rounded-lg text-black dark:text-white  gap-[10px]">
       <div className="flex flex-col gap-[20px]">
         <div className="flex flex-row items-center justify-between flex-wrap gap-[10px]">
           <p className="text-[25px]">{currentVal}</p>
@@ -89,7 +112,7 @@ const CurrencyCard: React.FC<ICurrencyCard> = ({ currencyData, availableNumOfCoi
             onChange={(event) => handleSelectChange(event, setCurrentCurrencyIndex)}
             className="bg-transparent border border-gray-300 rounded-sm px-[10px] py-[2px] text-[20px]"
           >
-            <option value="">Select a currency</option>
+            <option>Select a currency</option>
             {currencyData?.map((item, index) => (
               <option key={index} value={item.currency}>
                 {item.currency}
@@ -128,17 +151,32 @@ const CurrencyCard: React.FC<ICurrencyCard> = ({ currencyData, availableNumOfCoi
         name="vol"
         ref={rangeInputRef}
         step={1}
-        min="0"
+        min="1"
         max={availableNumOfCoins}
+        value={currentVal}
+        onChange={(event) => {
+          setCurrentVal(Number(event.target.value));
+          setRange(Number(event.target.value));
+        }}
       />
+      {validationError && <p className="text-red-500 text-sm mt-2">{validationMessage}</p>}
       <button
         onClick={() => {
-          handleExchange;
-          setOpenModalWindow(true);
+          handleExchange();
+          setIsLoading(true);
         }}
-        className="mt-4 bg-blue-500 hover:opacity-50 transition-all text-white px-4 py-2 rounded"
+        className="mt-4 bg-blue-500 flex gap-[10px] flex-row items-center justify-center dark:bg-black dark:border dark:border-white hover:opacity-50 transition-all text-white px-4 py-2 rounded"
       >
-        Exchange
+        {isLoading ? "Loading..." : "Exchange"}
+        {isLoading && (
+          <Image
+            src={"/icons/rotate-right-loading.svg"}
+            className=" animate-spin"
+            width={15}
+            height={16}
+            alt="loading"
+          />
+        )}
       </button>
       {openModalWindow && (
         <ModalWindow

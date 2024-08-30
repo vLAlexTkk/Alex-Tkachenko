@@ -1,7 +1,7 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import axios from "axios";
+import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
 interface CurrencyData {
   currency: string;
@@ -20,7 +20,7 @@ interface CurrencyProviderProps {
   children: ReactNode;
 }
 
-export const CurrencyProvider: React.FC<CurrencyProviderProps> = ({ children }) => {
+export const CurrencyProvider = ({ children }: CurrencyProviderProps) => {
   const [currencyData, setCurrencyData] = useState<CurrencyData[] | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
