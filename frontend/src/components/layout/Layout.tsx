@@ -23,7 +23,7 @@ const Layout = ({ children }: ILayoutProps) => {
   }, [darkMode]);
 
   return (
-    <section className="bg-white dark:bg-black h-[100vh]">
+    <section className="bg-white dark:bg-black">
       <header className="shadow-xl border-b dark:bg-black dark:text-white text-blue-500 flex flex-row items-center justify-between p-[20px] bg-white/80">
         <div className="w-[40px] h-[40px]">
           <Image src={darkMode ? "/icons/logo-light.svg" : "/icons/logo-dark.svg"} width={40} height={40} alt="" />

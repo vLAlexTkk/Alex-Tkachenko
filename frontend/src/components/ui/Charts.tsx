@@ -1,3 +1,6 @@
+"use client";
+
+import { useSelectedCurrency } from "@/context/SelectedCurrencyChart";
 import React, { useEffect, useRef } from "react";
 
 declare global {
@@ -8,6 +11,7 @@ declare global {
 
 const TradingViewWidget = () => {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const { selectedCurrency } = useSelectedCurrency();
 
   useEffect(() => {
     const script = document.createElement("script");
@@ -20,7 +24,7 @@ const TradingViewWidget = () => {
           container_id: containerRef.current.id,
           width: "100%",
           height: "500",
-          symbol: "BTCUSDT",
+          symbol: selectedCurrency,
           interval: "D",
           timezone: "Etc/UTC",
           theme: "light",
@@ -50,9 +54,16 @@ const TradingViewWidget = () => {
         script.parentNode.removeChild(script);
       }
     };
-  }, []);
+  }, [selectedCurrency]);
 
-  return <div className="!z-[-10000000]" id="tradingview-widget" ref={containerRef} style={{ width: "100%", height: "500px" }} />;
+  return (
+    <div
+      className="!z-[-10000000]"
+      id="tradingview-widget"
+      ref={containerRef}
+      style={{ width: "100%", height: "500px" }}
+    />
+  );
 };
 
 export default TradingViewWidget;

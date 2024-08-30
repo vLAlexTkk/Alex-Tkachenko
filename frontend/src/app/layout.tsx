@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { CurrencyProvider } from "@/context/CurrencyDataContext";
+import { SelectedCurrencyProvider } from "@/context/SelectedCurrencyChart";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,7 +19,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <CurrencyProvider>
-        <body className={`${inter.className}`}>{children}</body>
+        <SelectedCurrencyProvider>
+          <body className={`${inter.className}`}>{children}</body>
+        </SelectedCurrencyProvider>
       </CurrencyProvider>
     </html>
   );

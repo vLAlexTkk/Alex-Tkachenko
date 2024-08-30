@@ -5,9 +5,11 @@ import { useCurrency } from "@/context/CurrencyDataContext";
 import Button from "@/components/ui/Button";
 import CoinChart from "@/components/ui/Charts";
 import CurrencyCard from "@/components/ui/CurrencyCard";
+import { useSelectedCurrency } from "@/context/SelectedCurrencyChart";
 
 function CurrencySwap() {
   const { currencyData } = useCurrency();
+  const { selectedCurrency } = useSelectedCurrency();
   return (
     <section className="bg-blue-500/5 lg:px-[40px] lg:py-[40px] py-[20px] px-[20px]">
       <h2 className="text-black text-[25px] dark:text-white font-semibold">Swap</h2>
@@ -18,24 +20,12 @@ function CurrencySwap() {
       <div className="flex flex-row mt-[40px] p-[20px] items-center flex-wrap justify-between gap-[10px]">
         <div className="w-full bg-white dark:border dark:bg-black rounded-lg p-[10px] shadow-lg lg:max-w-[30%]">
           <CurrencyCard currencyData={currencyData as any} availableNumOfCoins={20} />
-          <div className="text-gray-400 border-t border-b text-[12px] max-w-[350px] mx-auto mt-[3%] flex flex-col gap-[10px]">
-            <div className="flex flex-row px-[10px] pt-[10px] items-center justify-between w-full gap-[20px]">
-              <p>Swap Fee</p>
-              <p>$10</p>
-            </div>
-            <div className="border-t" />
-            <div className="flex flex-row px-[10px] pb-[0px] mx-auto items-center justify-between w-full gap-[20px]">
-              <p>Price Impact</p>
-              <p>0.1%</p>
-            </div>
-            <div className="border-t" />
-            <div className="flex flex-row px-[10px] pb-[10px] mx-auto items-center justify-between w-full gap-[20px]">
-              <p>Max deviation</p>
-              <p>5%</p>
-            </div>
-          </div>
         </div>
         <div className="w-full bg-white dark:bg-black dark:border p-[20px] rounded-lg shadow-lg lg:max-w-[60%]">
+          <div className="flex flex-row items-baseline gap-[10px]">
+            <h2 className="text-black mb-[10px] text-[25px] font-semibold dark:text-white">{selectedCurrency}</h2>
+            <p className="text-blue-500 text-[12px]">+0.06% today</p>
+          </div>
           <div style={{ width: "100%", height: 500 }}>
             <CoinChart />
           </div>

@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import * as yup from "yup";
 
 import ModalWindow from "@/components/ui/Modal";
+import { useSelectedCurrency } from "@/context/SelectedCurrencyChart";
 
 interface CurrencyData {
   currency: string;
@@ -17,6 +18,7 @@ interface ICurrencyCard {
 }
 
 const CurrencyCard: React.FC<ICurrencyCard> = ({ currencyData, availableNumOfCoins }) => {
+  const { selectCurrency, selectedCurrency } = useSelectedCurrency();
   const validationSchema = yup.object().shape({
     currentCurrencyIndex: yup.number().nullable().required("Please select a source currency"),
     targetCurrencyIndex: yup.number().nullable().required("Please select a target currency"),
@@ -104,13 +106,16 @@ const CurrencyCard: React.FC<ICurrencyCard> = ({ currencyData, availableNumOfCoi
   };
 
   return (
-    <div className="flex flex-col bg-blue-500/5 border p-[10px] rounded-lg text-black dark:text-white  gap-[10px]">
+    <div
+      onMouseMove={() => selectCurrency(currencyData[currentCurrencyIndex!]?.currency)}
+      className="flex flex-col bg-blue-500/5 border p-[10px] rounded-lg text-black dark:text-white  gap-[10px]"
+    >
       <div className="flex flex-col gap-[20px]">
         <div className="flex flex-row items-center justify-between flex-wrap gap-[10px]">
           <p className="text-[25px]">{currentVal}</p>
           <select
             onChange={(event) => handleSelectChange(event, setCurrentCurrencyIndex)}
-            className="bg-transparent border border-gray-300 rounded-sm px-[10px] py-[2px] text-[20px]"
+            className="bg-transparent border max-w-[200px]  border-gray-300 rounded-sm px-[10px] py-[2px] text-[20px]"
           >
             <option>Select a currency</option>
             {currencyData?.map((item, index) => (
@@ -126,9 +131,9 @@ const CurrencyCard: React.FC<ICurrencyCard> = ({ currencyData, availableNumOfCoi
         <div className="flex flex-row items-center justify-between flex-wrap gap-[10px]">
           <select
             onChange={(event) => handleSelectChange(event, setTargetCurrencyIndex)}
-            className="bg-transparent border border-gray-300 rounded-sm px-[10px] py-[2px] text-[20px]"
+            className="bg-transparent max-w-[200px] border border-gray-300 rounded-sm px-[10px] py-[2px] text-[20px]"
           >
-            <option value="">Select target currency</option>
+            <option>Select target currency</option>
             {currencyData?.map((item, index) => (
               <option key={index} value={item.currency}>
                 {item.currency}
@@ -139,7 +144,7 @@ const CurrencyCard: React.FC<ICurrencyCard> = ({ currencyData, availableNumOfCoi
         </div>
       </div>
       <div className="flex text-gray-400 text-[12px] flex-row items-center justify-between gap-[10px]">
-        <p>${calculatedPrice}</p>
+        <p>${calculatedPrice.toFixed(2)}</p>
         <p className="flex gap-[2px]">
           Balance: {availableNumOfCoins}
           {currentVal === availableNumOfCoins && <span>MAX</span>}
@@ -167,7 +172,7 @@ const CurrencyCard: React.FC<ICurrencyCard> = ({ currencyData, availableNumOfCoi
         }}
         className="mt-4 bg-blue-500 flex gap-[10px] flex-row items-center justify-center dark:bg-black dark:border dark:border-white hover:opacity-50 transition-all text-white px-4 py-2 rounded"
       >
-        {isLoading ? "Loading..." : "Exchange"}
+        {isLoading ? "Loading..." : "Trade"}
         {isLoading && (
           <Image
             src={"/icons/rotate-right-loading.svg"}
@@ -178,6 +183,22 @@ const CurrencyCard: React.FC<ICurrencyCard> = ({ currencyData, availableNumOfCoi
           />
         )}
       </button>
+      <div className="text-gray-400 w-full border-t border-b text-[12px] max-w-[350px] mx-auto mt-[3%] flex flex-col gap-[10px]">
+        <div className="flex flex-row px-[10px] pt-[10px] items-center justify-between w-full gap-[20px]">
+          <p>Swap Fee</p>
+          <p>$10</p>
+        </div>
+        <div className="border-t" />
+        <div className="flex flex-row px-[10px] pb-[0px] mx-auto items-center justify-between w-full gap-[20px]">
+          <p>Price Impact</p>
+          <p>0.1%({(calculatedPrice.toFixed(2) as any) % 0.1})</p>
+        </div>
+        <div className="border-t" />
+        <div className="flex flex-row px-[10px] pb-[10px] mx-auto items-center justify-between w-full gap-[20px]">
+          <p>Max deviation</p>
+          <p>5%(${(calculatedPrice.toFixed(2) as any) % 5})</p>
+        </div>
+      </div>
       {openModalWindow && (
         <ModalWindow
           isOpen={openModalWindow}
